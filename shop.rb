@@ -1,10 +1,13 @@
 # Class for shop, or products category list.
+require_relative 'products_category'
 class Shop
   attr_reader :name
-  attr_reader :categorys_list
+  attr_accessor :fruits
+  attr_accessor :meat
+  attr_accessor :category_list
 
-  def initialize(name, categorys_list = nil)
+  def initialize(name, *category_list)
     @name = name
-    @categorys_list = categorys_list || []
+    @category_list = *category_list
   end
 end

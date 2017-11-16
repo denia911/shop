@@ -3,8 +3,9 @@ class ProductsCategory
   attr_reader :name
   attr_reader :products
 
-  def initialize(name, products = nil)
+  def initialize(name, products)
     @name = name
-    @products = products || []
+    @products = products
   end
+
 end
