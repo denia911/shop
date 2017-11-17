@@ -7,5 +7,4 @@ class ProductsCategory
     @name = name
     @products = products
   end
-
 end

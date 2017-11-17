@@ -8,13 +8,7 @@ class Cart
     @prod = prod
     @value = 0
     @count = count
-    if @shopping_list.map { |e| e[0].name }.any? { |e| e == @prod.name }
-      @shopping_list.map { |e|
-                              if e[0].name == @prod.name
-                                e[1] += @count
-                              end }
-    else @shopping_list << [@prod, @count, @value]
-    end
+    check_cart(@prod, @count, @value)
   end
 
   def delete
@@ -22,26 +16,48 @@ class Cart
     @prod = gets.chomp
     puts 'Enter the quantity of goods'
     @count = gets.chomp.to_i
-    if @shopping_list.map { |e| e[0].name}.any? { |e| e == @prod }
-      @shopping_list.map { |e| if e[0].name == @prod
-                                e[1] -= @count
-                              end }
+    delete_prod(@prod, @count)
+  end
+
+  def check
+    @check = delete_check
+    @check.compact!
+    puts(@check.map { |e| [e[0].name, e[1], e[2]] })
+    @amount = 0
+    @check.map { |e| @amount += e[2] }
+    puts "The amount of all purchases is #{@amount}"
+  end
+
+  private
+
+  def check_cart(prod, count, value)
+    if @shopping_list.map { |e| e[0].name }.any? { |e| e == prod.name }
+      @shopping_list.map do |e|
+        e[1] += count if e[0].name == prod.name
+      end
+    else @shopping_list << [prod, count, value]
+    end
+  end
+
+  def delete_prod(prod, count)
+    if @shopping_list.map { |e| e[0].name }.any? { |e| e == prod }
+      @shopping_list.map do |e|
+        e[1] -= count if e[0].name == prod
+      end
     else puts 'There is no such product in your shopping cart'
     end
   end
 
-  def check
-    @check = @shopping_list.map { |e| if e[1] >= 3
-                                       e[2] = e[0].trade_price * e[1]
-                                     elsif e[1] <= 0
-                                       e = nil
-                                     else
-                                       e[2] = e[0].price * e[1]
-                                     end
-                                      e }
-    puts @check.compact.map { |e| [e[0].name, e[1], e[2]] }
-    @amount = 0
-    @check.map{ |e| @amount += e[2]}
-    puts "The amount of all purchases is #{@amount}"
+  def delete_check
+    @shopping_list.map do |e|
+      if e[1] >= 3
+        e[2] = e[0].trade_price * e[1]
+      elsif e[1] <= 0
+        e = nil
+      else
+        e[2] = e[0].price * e[1]
+      end
+      e
+    end
   end
 end

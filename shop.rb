@@ -1,5 +1,5 @@
-# Class for shop, or products category list.
 require_relative 'products_category'
+# Class for shop, or products category list.
 class Shop
   attr_reader :name
   attr_accessor :fruits
