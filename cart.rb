@@ -6,7 +6,6 @@ class Cart
 
   def add(prod, count)
     @prod = prod
-    @value = 0
     @count = count
     check_cart(@prod, @count)
   end
@@ -17,12 +16,12 @@ class Cart
     puts 'Enter the quantity of goods'
     @count = gets.chomp.to_i
     delete_prod(@prod, @count)
+    check = delete_check
+    @shopping_list = check.compact!
   end
 
   def check
-    @check = delete_check
-    @check.compact!
-    puts(@check.map { |position| [position['prod'].name, position['count']] })
+    puts(print_check)
     print_amount
   end
 
@@ -33,16 +32,19 @@ class Cart
       @shopping_list.map do |position|
         position['count'] += count if position['prod'].name == prod
       end
-    else @shopping_list << { 'prod' => prod, 'count' => count }
+    else
+      @shopping_list << { 'prod' => prod, 'count' => count }
     end
   end
 
   def delete_prod(prod, count)
-    if @shopping_list.any? { |position| position['prod'].name == prod }
-      @shopping_list.map do |position|
-        position['count'] -= count if position['prod'].name == prod
-      end
-    else puts 'There is no such product in your shopping cart'
+    exists = @shopping_list.any? { |position| position['prod'].name == prod }
+    unless exists
+      puts 'There is no such product in your shopping cart'
+      return
+    end
+    @shopping_list.map do |position|
+      position['count'] -= count if position['prod'].name == prod
     end
   end
 
@@ -54,14 +56,17 @@ class Cart
   end
 
   def print_amount
-    @amount = 0
-    @shopping_list.map do |position|
-      @amount += if position['count'] >= 3
-                   position['prod'].trade_price * position['count']
-                 else
-                   position['prod'].price * position['count']
-                 end
+    amount = @shopping_list.inject(0) do |result, position|
+      result + if position['count'] >= 3
+                 position['prod'].trade_price * position['count']
+               else
+                 position['prod'].price * position['count']
+               end
     end
-    puts "The amount of all purchases is #{@amount}"
+    puts "The amount of all purchases is #{amount}"
+  end
+
+  def print_check
+    @shopping_list.map { |position| [position['prod'].name, position['count']] }
   end
 end

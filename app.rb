@@ -5,7 +5,7 @@ require_relative 'shop'
 require_relative 'products_category'
 require_relative 'product'
 cart = Cart.new
-put = 0
+put = nil
 puts('To view categories, enter - categories.
 To add an item to the shopping cart, enter the product name in the category.
 To delete the product, enter - delete
@@ -18,11 +18,10 @@ until put == 'end'
     puts(@shop.category_list.map(&:name))
     puts 'Enter the category name in order to see the products'
   when 'meat', 'fruits'
-    products = @shop.category_list.find { |cat| cat.name == put.to_s }.products
-    puts(products.map do |prod|
-      ["Name #{prod.name}", "Price #{prod.price}",
-       "Trade price #{prod.trade_price}"]
-    end)
+    products = @shop.category_list.find { |cat| cat.name == put }.products
+    products.each do |prod|
+      puts "Name #{prod.name}\nPrice #{prod.price}\nTrPrice #{prod.trade_price}"
+    end
     puts('Enter product name for buy')
     prod_name = gets.chomp
     puts 'Enter the quantity of goods'
