@@ -13,35 +13,25 @@ To view the check, enter - check
 To end shopping, enter - end')
 until put == 'end'
   put = gets.chomp
-  if put == 'categories'
+  case put
+  when 'categories'
     puts(@shop.category_list.map(&:name))
     puts 'Enter the category name in order to see the products'
-  elsif put == 'fruits'
-    products_f = @shop.category_list.find { |e| e.name == 'fruits' }.products
-    puts(products_f.map do |e|
-      ["Name #{e.name}", "Price #{e.price}", "Trade price #{e.trade_price}"]
+  when 'meat', 'fruits'
+    products = @shop.category_list.find { |cat| cat.name == put.to_s }.products
+    puts(products.map do |prod|
+      ["Name #{prod.name}", "Price #{prod.price}",
+       "Trade price #{prod.trade_price}"]
     end)
     puts('Enter product name for buy')
     prod_name = gets.chomp
     puts 'Enter the quantity of goods'
     count = gets.chomp.to_i
-    cart.add(products_f.find { |e| e.name == prod_name }, count)
+    cart.add(products.find { |prod| prod.name == prod_name }, count)
     puts('To view categories, enter - categories.')
-  elsif put == 'meat'
-    products_m = @shop.category_list.find { |e| e.name == 'meat' }.products
-    puts(products_m.map do |e|
-      ["Name #{e.name}", "Price #{e.price}", "Trade price #{e.trade_price}"]
-    end)
-    puts 'Enter product name for buy'
-    prod_name = gets.chomp
-    puts 'Enter the quantity of goods'
-    count = gets.chomp.to_i
-    cart.add(products_m.find { |e| e.name == prod_name }, count)
-    puts('To view categories, enter - categories.')
-  elsif put == 'check'
+  when 'check'
     cart.check
-  elsif put == 'delete'
+  when 'delete'
     cart.delete
-  elsif put == 'end'
   end
 end

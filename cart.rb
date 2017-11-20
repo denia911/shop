@@ -8,7 +8,7 @@ class Cart
     @prod = prod
     @value = 0
     @count = count
-    check_cart(@prod, @count, @value)
+    check_cart(@prod, @count)
   end
 
   def delete
@@ -22,42 +22,46 @@ class Cart
   def check
     @check = delete_check
     @check.compact!
-    puts(@check.map { |e| [e[0].name, e[1], e[2]] })
-    @amount = 0
-    @check.map { |e| @amount += e[2] }
-    puts "The amount of all purchases is #{@amount}"
+    puts(@check.map { |position| [position['prod'].name, position['count']] })
+    print_amount
   end
 
   private
 
-  def check_cart(prod, count, value)
-    if @shopping_list.map { |e| e[0].name }.any? { |e| e == prod.name }
-      @shopping_list.map do |e|
-        e[1] += count if e[0].name == prod.name
+  def check_cart(prod, count)
+    if @shopping_list.any? { |position| position['prod'].name == prod }
+      @shopping_list.map do |position|
+        position['count'] += count if position['prod'].name == prod
       end
-    else @shopping_list << [prod, count, value]
+    else @shopping_list << { 'prod' => prod, 'count' => count }
     end
   end
 
   def delete_prod(prod, count)
-    if @shopping_list.map { |e| e[0].name }.any? { |e| e == prod }
-      @shopping_list.map do |e|
-        e[1] -= count if e[0].name == prod
+    if @shopping_list.any? { |position| position['prod'].name == prod }
+      @shopping_list.map do |position|
+        position['count'] -= count if position['prod'].name == prod
       end
     else puts 'There is no such product in your shopping cart'
     end
   end
 
   def delete_check
-    @shopping_list.map do |e|
-      if e[1] >= 3
-        e[2] = e[0].trade_price * e[1]
-      elsif e[1] <= 0
-        e = nil
-      else
-        e[2] = e[0].price * e[1]
-      end
-      e
+    @shopping_list.map do |position|
+      position = nil if position['count'] <= 0
+      position
     end
+  end
+
+  def print_amount
+    @amount = 0
+    @shopping_list.map do |position|
+      @amount += if position['count'] >= 3
+                   position['prod'].trade_price * position['count']
+                 else
+                   position['prod'].price * position['count']
+                 end
+    end
+    puts "The amount of all purchases is #{@amount}"
   end
 end
