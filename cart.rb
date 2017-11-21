@@ -11,10 +11,10 @@ class Cart
   def delete
     puts 'Enter the name of product'
     prod = gets.chomp
-    puts 'Enter the quantity of goods'
-    count = gets.chomp.to_i
+    puts 'Enter the quantity of goods or - all'
+    count = gets.chomp
     delete_prod(prod, count)
-    delete_check
+    @shopping_list.delete_if { |position| position['count'].zero? }
   end
 
   def check
@@ -26,11 +26,12 @@ class Cart
 
   def check_cart(prod, count)
     exists = @shopping_list.any? { |position| position['prod'] == prod }
-    if exists
-      @shopping_list.map do |position|
-        position['count'] += count if position['prod'].name == prod.name
-      end
-    else @shopping_list << { 'prod' => prod, 'count' => count }
+    unless exists
+      @shopping_list << { 'prod' => prod, 'count' => count }
+      return
+    end
+    @shopping_list.map do |position|
+      position['count'] += count if position['prod'].name == prod.name
     end
   end
 
@@ -40,22 +41,26 @@ class Cart
       puts 'There is no such product in your shopping cart'
       return
     end
-    @shopping_list.map do |position|
-      position['count'] -= count if position['prod'].name == prod
+    delete_check(prod, count)
+  end
+
+  def delete_check(prod, count)
+    case count
+    when 'all'
+      @shopping_list.map do |position|
+        position['count'] = 0 if position['prod'].name == prod
+      end
+    else
+      @shopping_list.map do |position|
+        position['count'] -= count.to_i if position['prod'].name == prod
+      end
     end
   end
 
-  def delete_check
-    @shopping_list.delete_if { |position| position['count'] <= 0 }
-  end
-
   def print_amount
-    amount = @shopping_list.inject(0) do |result, position|
-      result + if position['count'] >= 3
-                 position['prod'].trade_price * position['count']
-               else
-                 position['prod'].price * position['count']
-               end
+    amount = @shopping_list.inject(0) do |result, pos|
+      price = pos['count'] >= 3 ? pos['prod'].trade_price : pos['prod'].price
+      result + price * pos['count']
     end
     puts "The amount of all purchases is #{amount}"
   end
