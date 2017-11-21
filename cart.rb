@@ -5,19 +5,16 @@ class Cart
   end
 
   def add(prod, count)
-    @prod = prod
-    @count = count
-    check_cart(@prod, @count)
+    check_cart(prod, count)
   end
 
   def delete
     puts 'Enter the name of product'
-    @prod = gets.chomp
+    prod = gets.chomp
     puts 'Enter the quantity of goods'
-    @count = gets.chomp.to_i
-    delete_prod(@prod, @count)
-    check = delete_check
-    @shopping_list = check.compact!
+    count = gets.chomp.to_i
+    delete_prod(prod, count)
+    delete_check
   end
 
   def check
@@ -28,12 +25,12 @@ class Cart
   private
 
   def check_cart(prod, count)
-    if @shopping_list.any? { |position| position['prod'].name == prod }
+    exists = @shopping_list.any? { |position| position['prod'] == prod }
+    if exists
       @shopping_list.map do |position|
-        position['count'] += count if position['prod'].name == prod
+        position['count'] += count if position['prod'].name == prod.name
       end
-    else
-      @shopping_list << { 'prod' => prod, 'count' => count }
+    else @shopping_list << { 'prod' => prod, 'count' => count }
     end
   end
 
@@ -49,10 +46,7 @@ class Cart
   end
 
   def delete_check
-    @shopping_list.map do |position|
-      position = nil if position['count'] <= 0
-      position
-    end
+    @shopping_list.delete_if { |position| position['count'] <= 0 }
   end
 
   def print_amount
